@@ -11,13 +11,26 @@ import * as EmailValidator from 'email-validator';
 const router: Router = Router();
 
 async function generatePassword(plainTextPassword: string): Promise<string> {
-    //@TODO Use Bcrypt to Generated Salted Hashed Passwords
-    return "NotYetImplemented"
+    //@TODO Use Bcrypt to Generate Salted Hashed Passwords
+    try {
+        const saltRounds = 10;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hash = await bcrypt.hash(plainTextPassword, salt);
+        return hash;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 async function comparePasswords(plainTextPassword: string, hash: string): Promise<boolean> {
     //@TODO Use Bcrypt to Compare your password to your Salted Hashed Password
-    return true
+    try {
+        return await bcrypt.compare(plainTextPassword, hash);
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
 
 function generateJWT(user: User): string {
@@ -86,7 +99,7 @@ router.post('/login', async (req: Request, res: Response) => {
     res.status(200).send({ auth: true, token: jwt, user: user.short()});
 });
 
-//register a new user
+//register a new user (/api/v0/users/auth/)
 router.post('/', async (req: Request, res: Response) => {
     const email = req.body.email;
     const plainTextPassword = req.body.password;

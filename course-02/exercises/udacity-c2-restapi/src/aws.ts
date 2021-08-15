@@ -1,3 +1,4 @@
+import { S3Control } from 'aws-sdk';
 import AWS = require('aws-sdk');
 import { config } from './config/config';
 
